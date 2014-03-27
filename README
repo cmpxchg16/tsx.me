@@ -1,0 +1,11 @@
+Benchmark multiple implementation of multi-producer multi-consumer queue:
+
+1. Lock free
+2. Naive (mutex based)
+3. Boost lock free
+4. Intel TSX (Transactional Synchronization Extensions)
+
+Build:
+$> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` main.cpp -lpthread -Wl,--no-as-needed -mrtm
+
+Author: Uri Shamay (shamayuri@gmail.com)
