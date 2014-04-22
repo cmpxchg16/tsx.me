@@ -3,7 +3,7 @@
  * performance and verification tests.
  *
  * Build with (g++ version must be >= 4.5.0):
- * $> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` main.cpp -pthread -Wl,--no-as-needed -mrtm
+ * $> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` main.cpp -pthread -ltbb -Wl,--no-as-needed
  *
  * I verified the program with g++ 4.5.3, 4.6.1, 4.6.3 and 4.8.1.
  *
@@ -341,8 +341,7 @@ private:
     T		**ptr_array_;
 };
 
-#include "HybridLock.h"
-
+#include <tbb/spin_mutex.h>
 /*
  * ----------------------------------------------------------------------------------------------------
  * Intel TSX (Transactional Synchronization Extensions) fixed size multi-producer multi-consumer queue
@@ -358,7 +357,7 @@ public:
     {
         while(1)
         {
-            std::lock_guard<HybridLock> lock(lock_);
+            tbb::speculative_spin_mutex::scoped_lock guard(lock_);
             if (counter_ >= Q_SIZE)
             {
                 continue;
@@ -375,7 +374,7 @@ public:
         T* t = nullptr;
         while(1)
         {
-            std::lock_guard<HybridLock> lock(lock_);
+            tbb::speculative_spin_mutex::scoped_lock guard(lock_);
             if (counter_ == 0)
             {
                 continue;
@@ -388,7 +387,8 @@ public:
     }
 
 private:
-    HybridLock lock_;
+
+    tbb::speculative_spin_mutex lock_;
     unsigned long counter_;
     T ____cacheline_aligned* array_[Q_SIZE] ____cacheline_aligned;
 };
