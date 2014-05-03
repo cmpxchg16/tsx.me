@@ -3,7 +3,7 @@
  * performance and verification tests.
  *
  * Build with (g++ version must be >= 4.5.0):
- * $> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` main.cpp -pthread -ltbb -Wl,--no-as-needed
+ * $> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` queue.cpp -o queue -pthread -ltbb -Wl,--no-as-needed
  *
  * I verified the program with g++ 4.5.3, 4.6.1, 4.6.3 and 4.8.1.
  *
@@ -26,13 +26,12 @@
 #ifndef __x86_64__
 #warning "The program is developed for x86-64 architecture only."
 #endif
-#if !defined(DCACHE1_LINESIZE) || !DCACHE1_LINESIZE
-#ifdef DCACHE1_LINESIZE
-#undef DCACHE1_LINESIZE
-#endif
+
+#ifndef DCACHE1_LINESIZE
 #define ____cacheline_aligned	__attribute__((aligned(64)))
-#endif
+#else
 #define ____cacheline_aligned	__attribute__((aligned(DCACHE1_LINESIZE)))
+#endif
 
 #include <sys/time.h>
 #include <limits.h>

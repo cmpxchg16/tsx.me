@@ -1,13 +1,28 @@
-Benchmark multiple implementation of multi-producer multi-consumer queue:
+Benchmarks for TSX VS lock-free VS naive lock (std::mutex/spinlock)
 
-1. Lock free
-2. Naive (mutex based)
-3. Boost lock free
-4. Intel TSX (Transactional Synchronization Extensions)
 
-Build:
-$> g++ -Wall -std=c++11 -O3 -D DCACHE1_LINESIZE=`getconf LEVEL1_DCACHE_LINESIZE` main.cpp -pthread -ltbb -Wl,--no-as-needed
+Implementations:
+----------------
 
-Note: the tsx implementation based on the tbb::speculative_spin_mutex
+1. Queue
+2. Stack
+3. Counter
 
-Author: Uri Shamay (shamayuri@gmail.com)
+Note: the TSX implementation based on the tbb::speculative_spin_mutex
+
+
+Environment:
+------------
+
+Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz
+16GB RAM
+Ubuntu 14.04
+Boost 1.55
+TBB 4.2
+g++ 4.8.2
+
+
+Author: 
+-------
+
+Uri Shamay (shamayuri@gmail.com)
