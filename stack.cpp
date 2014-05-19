@@ -10,6 +10,7 @@
 #include "spinlocked.h"
 #include "lockfree.h"
 #include "tsxlocked.h"
+#include "stmlocked.h"
 
 struct LockedElement
 {
@@ -112,8 +113,9 @@ int main()
         double lockedTime = Test<LockedStack<LockedElement>, LockedElement>(i);
         double spinLockedTime = Test<SpinLockedStack<LockedElement>, LockedElement>(i);
         double tsxLockedTime = Test<TSXLockedStack<LockedElement>, LockedElement>(i);
+        double stmLockedTime = Test<STMLockedStack<LockedElement>, LockedElement>(i);
 
-        printf("%d,%d,%d,%d,%d\n", i, (int)lockFreeTime, (int)lockedTime, (int)spinLockedTime, (int)tsxLockedTime);
+        printf("%d,%d,%d,%d,%d,%d\n", i, (int)lockFreeTime, (int)lockedTime, (int)spinLockedTime, (int)tsxLockedTime, (int)stmLockedTime);
     }
     return 0;
 }

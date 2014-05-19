@@ -394,6 +394,61 @@ private:
 
 
 /*
+ * ----------------------------------------------------------------------------------------------------
+ * STM (Software Transactional Memory) fixed size multi-producer multi-consumer queue
+ * ----------------------------------------------------------------------------------------------------
+ */
+template<class T, unsigned long Q_SIZE = QUEUE_SIZE>
+class STMQueue
+{
+public:
+    explicit STMQueue() : counter_(0) {}
+
+    void push(T* t) noexcept
+    {
+        while(1)
+        {
+            __transaction_atomic
+            {
+                if (counter_ >= Q_SIZE)
+                {
+                    continue;
+                }
+
+                array_[counter_] = t;
+                ++counter_;
+                break;
+            }
+        }
+    }
+
+    T* pop() noexcept
+    {
+        T* t = nullptr;
+        while(1)
+        {
+            __transaction_atomic
+            {
+                if (counter_ == 0)
+                {
+                    continue;
+                }
+
+                t = array_[--counter_];
+                break;
+            }
+        }
+        return t;
+    }
+
+private:
+
+    unsigned long counter_;
+    T ____cacheline_aligned* array_[Q_SIZE] ____cacheline_aligned;
+};
+
+
+/*
  * ------------------------------------------------------------------------
  *	Tests for naive and lock-free and TSX queues
  * ------------------------------------------------------------------------
@@ -527,6 +582,9 @@ main()
 
     TSXQueue<q_type> t_q;
     run_test<TSXQueue<q_type>>(std::move(t_q));
+
+    STMQueue<q_type> s_q;
+    run_test<STMQueue<q_type>>(std::move(s_q));
 
     return 0;
 }

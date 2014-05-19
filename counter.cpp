@@ -80,6 +80,26 @@ private:
     size_t counter_ = 0;
 };
 
+class STMCounter
+{
+public:
+    void increment()
+    {
+        __transaction_atomic
+        {
+            ++counter_;
+        }
+    }
+
+    size_t count()
+    {
+        return counter_;
+    }
+
+private:
+    size_t counter_ = 0;
+};
+
 class TSXCounter
 {
 public:
@@ -222,8 +242,9 @@ int main()
         double t3 = Test<PthreadSpinCounter>(i);
         double t4 = Test<NaiveSpinCounter>(i);
         double t5 = Test<TSXCounter>(i);
-        double t6 = Test<MutexCounter>(i);
-        printf("%d,%d,%d,%d,%d,%d,%d\n", i, (int)t1, (int)t2, (int)t3, (int)t4, (int)t5, (int)t6);
+        double t6 = Test<STMCounter>(i);
+        double t7 = Test<MutexCounter>(i);
+        printf("%d,%d,%d,%d,%d,%d,%d,%d\n", i, (int)t1, (int)t2, (int)t3, (int)t4, (int)t5, (int)t6, (int)t7);
     }
     return 0;
 }

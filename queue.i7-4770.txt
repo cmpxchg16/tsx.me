@@ -1,12 +1,15 @@
-6475ms
+3839ms
 check X data...
 Passed
-29719ms
+28475ms
 check X data...
 Passed
-10811ms
+9322ms
 check X data...
 Passed
-17274ms
+15582ms
+check X data...
+Passed
+13703ms
 check X data...
 Passed

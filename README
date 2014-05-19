@@ -1,9 +1,8 @@
-Benchmarks for TSX VS lock-free VS naive lock (std::mutex/spinlock)
+Benchmarks for TSX (Hardware Transactional Memory) vs STM (Software Transactional Memory) vs lock-free vs Naive lock (std::mutex/spinlock)
 
 
 Implementations:
 ----------------
-
 1. Queue
 2. Stack
 3. Counter
@@ -13,7 +12,6 @@ Note: the TSX implementation based on the tbb::speculative_spin_mutex. The mutex
 
 Environment:
 ------------
-
 Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz 16GB RAM
 Intel(R) Xeon(R) CPU E3-1270 V2 @ 3.50GHz 32GB RAM
 Ubuntu 14.04
@@ -21,8 +19,6 @@ Boost 1.55
 TBB 4.2
 g++ 4.8.2
 
-
 Author: 
 -------
-
 Uri Shamay (shamayuri@gmail.com)
