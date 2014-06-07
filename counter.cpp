@@ -13,52 +13,7 @@
 
 #include <tbb/spin_mutex.h>
 
-class NaiveSpinLock
-{
-public:
-    void lock()
-    {
-        while (true)
-        {
-            if (!lock_.test_and_set(std::memory_order_acquire))
-            {
-                return;
-            }
-        }
-    }
-
-    void unlock()
-    {
-        lock_.clear(std::memory_order_release);
-    }
-
-private:
-    std::atomic_flag lock_ = ATOMIC_FLAG_INIT;
-};
-
-class PthreadSpinLock
-{
-public:
-
-    PthreadSpinLock()
-    {
-        pthread_spin_init(&lock_, 0);
-    }
-
-    void lock()
-    {
-        pthread_spin_lock(&lock_);
-    }
-
-    void unlock()
-    {
-        pthread_spin_unlock(&lock_);
-    }
-
-private:
-    pthread_spinlock_t lock_;
-};
-
+#include "locks.h"
 
 
 class MutexCounter
@@ -157,6 +112,63 @@ private:
     size_t counter_ = 0;
 };
 
+class CLHCounter
+{
+public:
+    void increment()
+    {
+        std::lock_guard<CLHLock> guard(lock_);
+        ++counter_;
+    }
+
+    size_t count()
+    {
+        return counter_;
+    }
+
+private:
+    CLHLock lock_;
+    size_t counter_ = 0;
+};
+
+class MPSCCounter
+{
+public:
+    void increment()
+    {
+        std::lock_guard<MPSCLock> guard(lock_);
+        ++counter_;
+    }
+
+    size_t count()
+    {
+        return counter_;
+    }
+
+private:
+    MPSCLock lock_;
+    size_t counter_ = 0;
+};
+
+class TicketCounter
+{
+public:
+    void increment()
+    {
+        std::lock_guard<TicketLock> guard(lock_);
+        ++counter_;
+    }
+
+    size_t count()
+    {
+        return counter_;
+    }
+
+private:
+    TicketLock lock_;
+    size_t counter_ = 0;
+};
+
 class AtomicCounter
 {
 public:
@@ -240,11 +252,14 @@ int main()
         double t1 = Test<DirtyCounter>(i);
         double t2 = Test<AtomicCounter>(i);
         double t3 = Test<PthreadSpinCounter>(i);
-        double t4 = Test<NaiveSpinCounter>(i);
-        double t5 = Test<TSXCounter>(i);
-        double t6 = Test<STMCounter>(i);
-        double t7 = Test<MutexCounter>(i);
-        printf("%d,%d,%d,%d,%d,%d,%d,%d\n", i, (int)t1, (int)t2, (int)t3, (int)t4, (int)t5, (int)t6, (int)t7);
+        double t4 = Test<CLHCounter>(i);
+        double t5 = Test<MPSCCounter>(i);
+        double t6 = Test<TicketCounter>(i);
+        double t7 = Test<NaiveSpinCounter>(i);
+        double t8 = Test<TSXCounter>(i);
+        double t9 = Test<STMCounter>(i);
+        double t10 = Test<MutexCounter>(i);
+        printf("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n", i, (int)t1, (int)t2, (int)t3, (int)t4, (int)t5, (int)t6, (int)t7, (int)t8, (int)t9, (int)t10);
     }
     return 0;
 }
